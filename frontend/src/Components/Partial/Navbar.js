@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { NavDropdown, Navbar, Nav, Container, Button } from "react-bootstrap";
 
-function CustomNavbar() {
+function CustomNavbar({ isAuthenticated }) {
   const [activeTab, setActiveTab] = useState("admin1Home");
 
   const handleTabChange = (tab) => {
@@ -78,13 +78,16 @@ function CustomNavbar() {
               </NavDropdown.Item>
             </NavDropdown>
 
-            <Button
-              variant="outline-dark"
-              className="ml-2"
-              onClick={handleLogout}
-            >
-              <span>Logout</span>
-            </Button>
+            {
+              isAuthenticated &&
+              <Button
+                variant="outline-dark"
+                className="ml-2"
+                onClick={handleLogout}
+              >
+                <span>Logout</span>
+              </Button>
+            }
           </Nav>
         </Navbar.Collapse>
       </Container>

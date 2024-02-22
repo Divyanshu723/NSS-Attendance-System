@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 
 import Login from './Components/Login';
 import Home from './Components/Home';
@@ -27,7 +27,8 @@ const App = () => {
 
   const fetchAuthStatus = async () => {
     try {
-    const list = await checkAuth();
+      const list = await checkAuth();
+      console.log("List : ", list);
     const isAuthenticated = list[0];
 
     const admin1 = (list[1] === 'Admin1' ? true : false);
@@ -66,18 +67,18 @@ const App = () => {
   return (
     <>
     {/* <Router> */}
-      <CustomNavbar />
+      <CustomNavbar isAuthenticated={isAuthenticated} />
       <Routes>
-        <Route path="/" exact={true} element={isAuthenticated ? <Home /> : <Login />} />
-        {/* <Route path="/login" element={ <Login/>} /> */}
+        <Route path="/" exact={true} element={isAuthenticated ? <Home /> : <Navigate to="/login" />} />
+        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
         {/* <Route path="/addAdmin" element={(isAuthenticated && isAdmin1) ? <AddAdmin/> : <Login/>} /> */}
-        <Route path="/showAdmins" element={(isAuthenticated && isAdmin1) ? <ShowAdmins/> : <Login/>} />
-        <Route path="/addEvent" element={(isAuthenticated && isAdmin1) ? <AddEvent/> : <Login/>} />
-        <Route path="/showCurrentEvents" element={(isAuthenticated && isAdmin1) ? <CurrentEvent/> : <Login/>} />
-        <Route path="/showPastEvents" element={(isAuthenticated && isAdmin1) ? <PastEvent/> : <Login/>} />
-        <Route path="/showCurrentEvent/:id" element={(isAuthenticated) ? <ShowCurrentEvent/> : <Login/>} />
-        <Route path="/showPastEvent/:id" element={(isAuthenticated) ? <ShowPastEvent/> : <Login/>} />
-        <Route path="/showUsers" element={(isAuthenticated && isAdmin1) ? <ShowUsers/> : <Login/>} />
+        <Route path="/showAdmins" element={(isAuthenticated && isAdmin1) ? <ShowAdmins /> : <Navigate to="/login" />} />
+        <Route path="/addEvent" element={(isAuthenticated && isAdmin1) ? <AddEvent /> : <Navigate to="/login" />} />
+        <Route path="/showCurrentEvents" element={(isAuthenticated && isAdmin1) ? <CurrentEvent /> : <Navigate to="/login" />} />
+        <Route path="/showPastEvents" element={(isAuthenticated && isAdmin1) ? <PastEvent /> : <Navigate to="/login" />} />
+        <Route path="/showCurrentEvent/:id" element={(isAuthenticated) ? <ShowCurrentEvent /> : <Navigate to="/login" />} />
+        <Route path="/showPastEvent/:id" element={(isAuthenticated) ? <ShowPastEvent /> : <Navigate to="/login" />} />
+        <Route path="/showUsers" element={(isAuthenticated && isAdmin1) ? <ShowUsers /> : <Navigate to="/login" />} />
         <Route path="*" element={<NotFound404 />} />
       </Routes>
     {/* </Router> */}

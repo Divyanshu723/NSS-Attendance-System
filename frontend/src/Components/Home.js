@@ -30,6 +30,7 @@ function Home() {
       );
 
       setActiveEventsEnteries(ActivedisplayedEntries);
+      console.log("activeEventsEnteries are: ", activeEventsEnteries);
       const PastdislayedEnteries = responseData.filter(
         (event) => new Date(event.endDate) < new Date()
       );
@@ -315,7 +316,7 @@ function Home() {
                 <td>{indexOfFirstEntry + index + 1}</td>
 
                 <td>
-                  <Link to={`/showPastEvent/${event._id}`}>
+                  <Link to={`/event/showPastEvent/${event._id}`}>
                     {event.eventName}
                   </Link>
                 </td>

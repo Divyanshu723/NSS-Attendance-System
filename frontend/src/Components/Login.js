@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import Home from "./Home";
 import { backend_url } from "./services";
+import { useNavigate } from "react-router-dom";
 
-function Login() {
+function Login({ setIsAuthenticated}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -22,6 +24,7 @@ function Login() {
     try {
       // First check if any user already logged in or not
       const token = localStorage.getItem("token");
+      console.log("Token: ", token);
 
       if (token !== null) {
         console.log("Not Empty", token, typeof token);
@@ -29,6 +32,7 @@ function Login() {
         return;
       }
 
+      // console.log("URL: ", `${backend_url}/admin/login`)
       const response = await fetch(`${backend_url}/login`, {
         method: "POST",
         headers: {
@@ -36,6 +40,7 @@ function Login() {
         },
         body: JSON.stringify({ email, password }),
       });
+      console.log(response);
 
       const data = await response.json();
 
@@ -52,7 +57,9 @@ function Login() {
   };
 
   if (isLoggedIn) {
-    return <Home />;
+    console.log("Login successful")
+    setIsAuthenticated(true);
+    navigate("/");
   }
 
   return (
