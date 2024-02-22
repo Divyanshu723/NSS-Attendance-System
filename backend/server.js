@@ -16,7 +16,7 @@ const connectDatabase = require("./database/conn");
 require("dotenv").config();
 
 const CORS_URL = process.env.CORS_URL;
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8000;
 
 const moment = require("moment-timezone");
 // Assuming you have the necessary imports and setup for the Event model

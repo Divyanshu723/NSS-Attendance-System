@@ -68,6 +68,17 @@ exports.addAdmin = async (req, res) => {
         branch,
         year,
     } = req.body;
+
+    // Code to chack whether the registration number is already exists or not
+    const isAlreadyExists = await Admin.findOne({ registrationNumber });
+    console.log("response of registration number ", isAlreadyExists);
+    if (isAlreadyExists) {
+        return res.status(500).json({
+            success: false,
+            message: "This registration number already exist"
+        })
+    }
+
     const password = registrationNumber;
     try {
         let admin = new Admin({
