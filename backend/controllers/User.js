@@ -7,6 +7,17 @@ exports.addUser = async (req, res) => {
     const { name, registrationNumber, email, course, branch, year } = req.body;
     const password = registrationNumber;
     // console.log(name, registrationNumber, password, course, branch, year);
+
+    // Code to chack whether the registration number is already exists or not
+    const isAlreadyExists = await User.findOne({ registrationNumber });
+    console.log("response of registration number ", isAlreadyExists);
+    if (isAlreadyExists) {
+        return res.status(500).json({
+            success: false,
+            message: "This registration number already exist"
+        })
+    }
+
     try {
         let user = new User({
             name,

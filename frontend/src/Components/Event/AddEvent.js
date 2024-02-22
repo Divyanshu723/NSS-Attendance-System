@@ -3,6 +3,7 @@ import { Form, Button, Container, Row, Col } from "react-bootstrap";
 // import Home from '../Home';
 import moment from "moment-timezone";
 import { backend_url } from "../services";
+import toast from 'react-hot-toast'
 
 const NewEventForm = () => {
   const [name, setName] = useState("");
@@ -27,7 +28,7 @@ const NewEventForm = () => {
     e.preventDefault();
 
     if (!name || !startDate || !endDate) {
-      setFormError("Please fill in all fields.");
+      setFormError("Please fill all fields.");
       return;
     }
 
@@ -39,6 +40,12 @@ const NewEventForm = () => {
       .format();
     const convertedEndDate = moment.tz(endDate, format, indiaTimeZone).format();
 
+    if (!(convertedStartDate <= convertedEndDate)) {
+      toast.error("Start date must be before end date");
+      setStartDate("")
+      setEndDate("")
+      return;
+    }
     console.log(
       "date time : " + convertedStartDate + " to " + convertedEndDate
     );
@@ -85,7 +92,6 @@ const NewEventForm = () => {
                 placeholder="Enter name"
                 value={name}
                 onChange={handleNameChange}
-                required
               />
             </Form.Group>
 
@@ -95,7 +101,6 @@ const NewEventForm = () => {
                 type="datetime-local"
                 value={startDate}
                 onChange={handleStartDateChange}
-                required
               />
             </Form.Group>
 
@@ -105,7 +110,6 @@ const NewEventForm = () => {
                 type="datetime-local"
                 value={endDate}
                 onChange={handleEndDateChange}
-                required
               />
             </Form.Group>
 

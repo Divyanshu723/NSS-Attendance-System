@@ -4,6 +4,7 @@ import { Button, Modal } from 'react-bootstrap';
 import { PencilFill, TrashFill } from 'react-bootstrap-icons';
 import * as XLSX from 'xlsx';
 import { backend_url } from "../services";
+import toast from "react-hot-toast";
 
 const AdminHeader = () => {
     const [AttendanceData, setAttendanceData] = useState(null);
@@ -200,12 +201,19 @@ const AdminHeader = () => {
 
             const data = await response.json();
 
+            // to check the user is already registered
+            if (!data.success) {
+                throw new Error(data.message)
+            }
+
             console.log('Response from backend:', data);
 
             handleModalToggle();
             setFormData(initialState);
             fetchData();
         } catch (error) {
+            toast.error(error.message)
+            setShowModal(false)
             console.log('Error sending data to backend:', error);
         }
     }
