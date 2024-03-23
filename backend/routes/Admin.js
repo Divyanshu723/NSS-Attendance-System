@@ -10,12 +10,20 @@ const {
     deleteAdmin,
     takeAttendance,
     deleteAttendance,
-    login
+    login,
+    sendotp,
+    checkOTP
 } = require("../controllers/Admin")
 
 
 //Route for login
 router.post("/login", login);
+
+// Rouote for sendotp
+router.post("/sendotp", sendotp);
+
+// Rouote for sendotp
+router.post("/checkOTP", checkOTP);
 
 //Route for create an admin
 router.post("/addAdmin", addAdmin)

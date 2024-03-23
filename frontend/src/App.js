@@ -1,3 +1,4 @@
+import "./App.css";
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 
@@ -16,10 +17,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Import the authentication API functions
 import { checkAuth } from './API/api';
+import VerifyEmail from './Components/VerifyEmail';
 
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // for OTP
+  const [isPartialAuthenticated, setIsPartialAuthenticated] = useState(false)
+  const [userEmail, setUserEmail] = useState("")
   const[isAdmin1, setIsAdmin1] = useState(false);
   const[isAdmin2, setIsAdmin2] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -70,8 +76,10 @@ const App = () => {
       <CustomNavbar isAuthenticated={isAuthenticated} />
       <Routes>
         <Route path="/" exact={true} element={isAuthenticated ? <Home /> : <Navigate to="/login" />} />
-        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/login" element={<Login setIsPartialAuthenticated={setIsPartialAuthenticated} setUserEmail={setUserEmail} />} />
         {/* <Route path="/addAdmin" element={(isAuthenticated && isAdmin1) ? <AddAdmin/> : <Login/>} /> */}
+        {/* For OTP */}
+        <Route path='/verify-email' element={isPartialAuthenticated ? <VerifyEmail userEmail={userEmail} setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" /> } />
         <Route path="/showAdmins" element={(isAuthenticated && isAdmin1) ? <ShowAdmins /> : <Navigate to="/login" />} />
         <Route path="/addEvent" element={(isAuthenticated && isAdmin1) ? <AddEvent /> : <Navigate to="/login" />} />
         <Route path="/showCurrentEvents" element={(isAuthenticated && isAdmin1) ? <CurrentEvent /> : <Navigate to="/login" />} />

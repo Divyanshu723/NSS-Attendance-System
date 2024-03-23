@@ -36,3 +36,6 @@
     transform: rotate(360deg);
   }
 }
+.custom-height {
+  min-height: calc(100vh - 9.5rem);
+}

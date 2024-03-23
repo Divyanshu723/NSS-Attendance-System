@@ -3,8 +3,10 @@ import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import Home from "./Home";
 import { backend_url } from "./services";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { sendOtp } from '../API/api'
 
-function Login({ setIsAuthenticated}) {
+function Login({ setIsPartialAuthenticated, setUserEmail }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -40,27 +42,22 @@ function Login({ setIsAuthenticated}) {
         },
         body: JSON.stringify({ email, password }),
       });
-      console.log(response);
-
       const data = await response.json();
-
+      console.log(data);
       if (data.success) {
-        const token = data.token;
-        localStorage.setItem("token", token);
-        setIsLoggedIn(true);
+        console.log("1st part of Login successful")
+        setUserEmail(email)
+        setIsPartialAuthenticated(true)
+        sendOtp(email, navigate)
       } else {
-        setIsLoggedIn(false);
+        toast.error(data.message)
       }
     } catch (error) {
+      toast.error("Error while logging in...")
       console.error("Error:", error);
     }
   };
 
-  if (isLoggedIn) {
-    console.log("Login successful")
-    setIsAuthenticated(true);
-    navigate("/");
-  }
 
   return (
     <Container>

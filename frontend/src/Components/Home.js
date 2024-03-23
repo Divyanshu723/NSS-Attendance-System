@@ -316,7 +316,7 @@ function Home() {
                 <td>{indexOfFirstEntry + index + 1}</td>
 
                 <td>
-                  <Link to={`/event/showPastEvent/${event._id}`}>
+                  <Link to={`/showPastEvent/${event._id}`}>
                     {event.eventName}
                   </Link>
                 </td>

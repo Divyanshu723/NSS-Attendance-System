@@ -1,8 +1,9 @@
 const Admin = require("../models/admin");
+const OTP = require("../models/OTP")
+const otpGenerator = require('otp-generator');
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const User = require("../models/user");
 
 const SECRET_KEY = process.env.secretKey;
 
@@ -32,26 +33,130 @@ exports.login = async (req, res) => {
         }
 
         if (await bcrypt.compare(password, admin.password)) {
-            const token = jwt.sign(
-                { email: admin.email, adminType: admin.adminType },
-                SECRET_KEY,
-                { expiresIn: "24h" } // Token expires in 24 hours
-            );
-
             console.log("Hogya compare");
-
             // // // Verify and decode the token
             // const decodedToken = jwt.verify(token, secretKey);
             // // Access the value of isAdmin from the decoded token
             // const isAdmin = decodedToken.adminType;
             // console.log(decodedToken, isAdmin);
 
-            res.json({ success: true, message: "Login successful", token });
+            res.json({ success: true, message: "1st Part of Login successful" });
         } else {
             res.json({ success: false, message: "Invalid credentials" });
         }
     } catch (error) {
         res.status(500).json({ success: false, message: "An error occurred" });
+    }
+}
+
+// sendOTP
+exports.sendotp = async (req, res) => {
+    console.log("BACK OTP");
+    try {
+        const { email } = req.body;
+        console.log("Email: " + email);
+
+        // Check if user is already present
+        // Find user with provided email
+        const checkUserPresent = await Admin.findOne({ email });
+        // to be used in case of signup
+        console.log("User check: " + checkUserPresent);
+        // If user found with provided email
+        if (!checkUserPresent) {
+            // Return 401 Unauthorized status code with error message
+            return res.status(401).json({
+                success: false,
+                message: `Email is not registered`,
+            });
+        }
+
+        var otp = otpGenerator.generate(6, {
+            upperCaseAlphabets: false,
+            lowerCaseAlphabets: false,
+            specialChars: false,
+        });
+        const result = await OTP.findOne({ otp: otp });
+        console.log("Result is Generate OTP Func");
+        console.log("OTP", otp);
+        console.log("Result", result);
+        while (result) {
+            otp = otpGenerator.generate(6, {
+                upperCaseAlphabets: false,
+            });
+        }
+        const otpPayload = { email, otp };
+        console.log("OTP Payload", otpPayload);
+        const otpBody = await OTP.create(otpPayload);
+        console.log("OTP Body", otpBody);
+        res.status(200).json({
+            success: true,
+            message: `OTP Sent Successfully`,
+            otp,
+        });
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ success: false, error: error.message, message: "Something went wrong" });
+    }
+};
+
+// Check OTP is correct or not
+exports.checkOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        
+        if (!email || !otp) {
+            return res.status(500).json({
+                success: false,
+                message: `All fields are required`,
+            });
+         }
+
+        // Check if user is already present
+        // Find user with provided email
+        const checkUserPresent = await Admin.findOne({ email });
+        // to be used in case of signup
+        console.log("User check: " + checkUserPresent);
+        // If user found with provided email
+        if (!checkUserPresent) {
+            // Return 401 Unauthorized status code with error message
+            return res.status(401).json({
+                success: false,
+                message: `Email is not registered`,
+            });
+        }
+
+        // find most recent otp for the user
+        const recentOtp = await OTP.find(({ email })).sort({ createdAt: -1 }).limit(1);
+
+        // validate OTP
+        if (recentOtp.length === 0) {
+            // OTP not foound
+            return res.status(400).json({
+                success: false,
+                message: "OTP not found",
+            })
+        } else if (otp !== recentOtp[0].otp) {
+            // invalid OTP
+            return res.status(400).json({
+                success: false,
+                message: "OTP not matched"
+            })
+        }
+
+        // Token generated
+        const token = jwt.sign(
+            { email: checkUserPresent.email, adminType: checkUserPresent.adminType },
+            SECRET_KEY,
+            { expiresIn: "24h" } // Token expires in 24 hours
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Email Verified",
+            token
+        })
+    } catch (error) {
+        
     }
 }
 
