@@ -4,6 +4,7 @@ const otpGenerator = require('otp-generator');
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const User = require("../models/user");
 
 const SECRET_KEY = process.env.secretKey;
 
