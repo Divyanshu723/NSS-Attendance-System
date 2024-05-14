@@ -25,7 +25,7 @@ function Login({ setIsPartialAuthenticated, setUserEmail }) {
 
     try {
       // First check if any user already logged in or not
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("nss-token");
       console.log("Token: ", token);
 
       if (token !== null) {

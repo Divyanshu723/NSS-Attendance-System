@@ -39,14 +39,13 @@ router.get("/checkAuth", async (req, res) => {
   const authorizationHeader = req.headers.authorization;
 
   const token = authorizationHeader && authorizationHeader.split(" ")[1];
-
   if (token === "null") {
     return res.json({ success: false, message: "Not Logged In" });
   }
   else {
     const decodedToken = jwt.decode(token);
-    const adminType = decodedToken.adminType;
-    const adminEmail = decodedToken.email;
+    const adminType = decodedToken?.adminType;
+    const adminEmail = decodedToken?.email;
     const admin = Admin.findOne({ email: adminEmail });
     if (!admin) {
       return res.json({ success: false, message: "User Not found" });
