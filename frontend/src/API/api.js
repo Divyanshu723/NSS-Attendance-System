@@ -3,7 +3,7 @@ import { backend_url } from "../Components/services";
 
 export const checkAuth = async () => {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('nss-token');
 
     const response = await fetch(`${backend_url}/checkAuth`, {
       method: 'GET',
@@ -86,7 +86,7 @@ export async function checkOTP(email, otp, navigate) {
 
 
     toast.success("OTP matched Successfully...");
-    localStorage.setItem("token", data.token);
+    localStorage.setItem("nss-token", data.token);
     return true;
   } catch (error) {
     console.error("Error checking OTP:", error);

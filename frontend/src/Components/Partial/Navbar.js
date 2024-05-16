@@ -11,7 +11,7 @@ function CustomNavbar({ isAuthenticated }) {
 
   const handleLogout = () => {
     // Remove the 'token' from localStorage
-    localStorage.removeItem("token");
+    localStorage.removeItem("nss-token");
 
     // Add any additional logout logic here
 

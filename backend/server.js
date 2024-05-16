@@ -39,7 +39,6 @@ router.get("/checkAuth", async (req, res) => {
   const authorizationHeader = req.headers.authorization;
 
   const token = authorizationHeader && authorizationHeader.split(" ")[1];
-
   if (token === "null") {
     return res.json({ success: false, message: "Not Logged In" });
   }
