@@ -33,7 +33,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  events: [],
+  events: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
+    },
+  ],
 });
 
 userSchema.statics.findAndValidate = async function ({ email, password }) {
