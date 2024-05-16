@@ -30,7 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(cors({ origin: "*", credentials: true }));
+app.use(cors({ origin: CORS_URL, credentials: true }));
 
 router.get("/checkAuth", async (req, res) => {
   console.log("/checkAuth");
