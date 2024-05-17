@@ -452,11 +452,11 @@ const ShowEvent = () => {
                     <td>
                       <button
                         onClick={() =>
-                          handleAttendance(student._id, student.email)
+                          handleAttendance(student?._id, student?.email)
                         }
-                        disabled={student.events.includes(event?.eventName)}
+                        disabled={student?.events?.includes(event?.eventName)}
                       >
-                        {student.events.includes(event?.eventName)
+                        {student?.events?.includes(event?.eventName)
                           ? "Present"
                           : "Absent"}
                       </button>
@@ -465,9 +465,9 @@ const ShowEvent = () => {
                       {/* <TrashFill  size={24} style={{ color: 'red' }} /> */}
                       <button
                         onClick={() =>
-                          handleDeleteAttendance(student._id, student.email)
+                          handleDeleteAttendance(student?._id, student?.email)
                         }
-                        disabled={!student.events.includes(event?.eventName)}
+                        disabled={!student?.events?.includes(event?.eventName)}
                       >
                         Delete
                       </button>
