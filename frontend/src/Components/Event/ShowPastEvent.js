@@ -382,16 +382,16 @@ const ShowEvent = () => {
                 {displayedEntries.map((student, index) => (
                   <tr key={index}>
                     <td>{indexOfFirstEntry + index + 1}</td>
-                    <td>{student.name}</td>
-                    <td>{student.registrationNumber}</td>
-                    <td>{student.course}</td>
-                    <td>{student.year}</td>
+                    <td>{student?.name}</td>
+                    <td>{student?.registrationNumber}</td>
+                    <td>{student?.course}</td>
+                    <td>{student?.year}</td>
                     <td>
                       <button
-                        disabled={student.events.includes(event?.eventName)}
+                        disabled={student?.events?.includes(event?.eventName)}
                         style={{ pointerEvents: "none" }}
                       >
-                        {student.events.includes(event?.eventName)
+                        {student?.events?.includes(event?.eventName)
                           ? "Present"
                           : "Absent"}
                       </button>
