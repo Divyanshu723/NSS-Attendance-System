@@ -40,7 +40,16 @@ const NewEventForm = () => {
       .format();
     const convertedEndDate = moment.tz(endDate, format, indiaTimeZone).format();
 
-    if (!(convertedStartDate <= convertedEndDate)) {
+    const today = moment().tz(format, indiaTimeZone).format();
+
+    if(convertedStartDate < today){
+      toast.error("Start date must be after current date");
+      setStartDate("")
+      setEndDate("")
+      return;
+    }
+
+    if (!(convertedStartDate < convertedEndDate)) {
       toast.error("Start date must be before end date");
       setStartDate("")
       setEndDate("")
