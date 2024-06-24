@@ -60,7 +60,7 @@ const ShowEvent = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          eventName: event.eventName,
+          eventName: event._id,
           userEmail: userEmail,
         }),
       });
@@ -91,7 +91,7 @@ const ShowEvent = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          eventName: event.eventName,
+          eventName: event._id,
           userEmail: userEmail,
         }),
       });
@@ -454,9 +454,9 @@ const ShowEvent = () => {
                         onClick={() =>
                           handleAttendance(student?._id, student?.email)
                         }
-                        disabled={student?.events?.includes(event?.eventName)}
+                        disabled={student?.events?.includes(event?._id)}
                       >
-                        {student?.events?.includes(event?.eventName)
+                        {student?.events?.includes(event?._id)
                           ? "Present"
                           : "Absent"}
                       </button>
@@ -467,7 +467,7 @@ const ShowEvent = () => {
                         onClick={() =>
                           handleDeleteAttendance(student?._id, student?.email)
                         }
-                        disabled={!student?.events?.includes(event?.eventName)}
+                        disabled={!student?.events?.includes(event?._id)}
                       >
                         Delete
                       </button>

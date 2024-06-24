@@ -290,7 +290,7 @@ exports.takeAttendance = async (req, res) => {
     try {
         // Retrieve the eventName and userEmail from the request body
         const { eventName, userEmail } = req.body;
-        const user = await User.findOne({ email: userEmail });
+        const user = await User.findOne({ email: userEmail }); 
         console.log("Event Name: ", eventName);
         console.log("Email: ", userEmail);
 
@@ -301,7 +301,7 @@ exports.takeAttendance = async (req, res) => {
                 .json({ success: false, message: "Invalid request data" });
         }
 
-        const exist = user.events.includes(eventName);
+        const exist = user?.events?.includes(eventName);
 
         if (exist) {
             return res.json({
@@ -310,7 +310,8 @@ exports.takeAttendance = async (req, res) => {
             });
         }
 
-        user.events.push(eventName);
+        user.events.push(eventName); 
+        console.log("User: ", user);   
         await user.save();
 
         // Assuming the attendance logic is successful, send a success response

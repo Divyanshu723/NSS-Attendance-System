@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { NavDropdown, Navbar, Nav, Container, Button } from "react-bootstrap";
 
-function CustomNavbar({ isAuthenticated }) {
+function CustomNavbar({ isAuthenticated, admin1, admin2 }) {
   const [activeTab, setActiveTab] = useState("admin1Home");
 
   const handleTabChange = (tab) => {
@@ -37,46 +37,52 @@ function CustomNavbar({ isAuthenticated }) {
               Home
             </Nav.Link>
 
-            <Nav.Link
-              as={NavLink}
-              to="/showUsers"
-              onClick={() => handleTabChange("addStudent")}
-              className={activeTab === "addStudent" ? "active" : ""}
-            >
-              All Members
-            </Nav.Link>
+            {
+              isAuthenticated && admin1 && <Nav.Link
+                as={NavLink}
+                to="/showUsers"
+                onClick={() => handleTabChange("addStudent")}
+                className={activeTab === "addStudent" ? "active" : ""}
+              >
+                All Members
+              </Nav.Link>
+            }
 
-            <Nav.Link
-              as={NavLink}
-              to="/showAdmins"
-              onClick={() => handleTabChange("addAdmin")}
-              className={activeTab === "addAdmin" ? "active" : ""}
-            >
-              All Admins
-            </Nav.Link>
+            {
+              isAuthenticated && admin1 && <Nav.Link
+                as={NavLink}
+                to="/showAdmins"
+                onClick={() => handleTabChange("addAdmin")}
+                className={activeTab === "addAdmin" ? "active" : ""}
+              >
+                All Admins
+              </Nav.Link>
+            }
 
-            <NavDropdown
-              title="Event"
-              id="basic-nav-dropdown"
-              onSelect={(eventKey) => handleTabChange(eventKey)}
-              className={
-                activeTab === "CurrentEvent" || activeTab === "PastEvent"
-                  ? "active"
-                  : ""
-              }
-            >
-              <NavDropdown.Item as={NavLink} to="/showCurrentEvents">
-                Current Event
-              </NavDropdown.Item>
+            {
+              isAuthenticated && admin1 && <NavDropdown
+                title="Event"
+                id="basic-nav-dropdown"
+                onSelect={(eventKey) => handleTabChange(eventKey)}
+                className={
+                  activeTab === "CurrentEvent" || activeTab === "PastEvent"
+                    ? "active"
+                    : ""
+                }
+              >
+                <NavDropdown.Item as={NavLink} to="/showCurrentEvents">
+                  Current Event
+                </NavDropdown.Item>
 
-              <NavDropdown.Item as={NavLink} to="/showPastEvents">
-                Past Event
-              </NavDropdown.Item>
+                <NavDropdown.Item as={NavLink} to="/showPastEvents">
+                  Past Event
+                </NavDropdown.Item>
 
-              <NavDropdown.Item as={NavLink} to="/addEvent">
-                Add Event
-              </NavDropdown.Item>
-            </NavDropdown>
+                <NavDropdown.Item as={NavLink} to="/addEvent">
+                  Add Event
+                </NavDropdown.Item>
+              </NavDropdown>
+            }
 
             {
               isAuthenticated &&

@@ -73,7 +73,7 @@ const App = () => {
   return (
     <>
     {/* <Router> */}
-      <CustomNavbar isAuthenticated={isAuthenticated} />
+      <CustomNavbar isAuthenticated={isAuthenticated} admin1={isAdmin1} admin2={isAdmin2}/>
       <Routes>
         <Route path="/" exact={true} element={isAuthenticated ? <Home /> : <Navigate to="/login" />} />
         <Route path="/login" element={<Login setIsPartialAuthenticated={setIsPartialAuthenticated} setUserEmail={setUserEmail} />} />
