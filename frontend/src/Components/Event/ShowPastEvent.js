@@ -7,7 +7,7 @@ import { Button, Modal } from "react-bootstrap";
 import * as XLSX from "xlsx";
 import { backend_url } from "../services";
 
-const ShowEvent = () => {
+const ShowEvent = ({ adminId }) => {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
   const [userData, setUserData] = useState([]);
@@ -27,7 +27,7 @@ const ShowEvent = () => {
 
   const fetchEvent = async () => {
     try {
-      const response = await fetch(`${backend_url}/showEvents`);
+      const response = await fetch(`${backend_url}/showEvents/${adminId}`);
       const data = await response.json();
       console.log(data);
       const event = data.find((event) => event._id === id);

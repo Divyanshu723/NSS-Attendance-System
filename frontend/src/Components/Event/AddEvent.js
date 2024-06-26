@@ -1,16 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
-// import Home from '../Home';
 import moment from "moment-timezone";
 import { backend_url } from "../services";
-import toast from 'react-hot-toast'
+import toast from 'react-hot-toast';
 
 const NewEventForm = () => {
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [selectedAdmin, setSelectedAdmin] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [formError, setFormError] = useState("");
+  const [admins2, setAdmins2] = useState([]);
+
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      const response = await fetch(`${backend_url}/showAdmins`);
+      const responseData = await response.json();
+      const admin2 = responseData.filter((admin) => admin.adminType === "Admin2");
+      setAdmins2(admin2);
+    };
+    fetchAdmins();
+  }, []);
 
   const handleNameChange = (e) => {
     setName(e.target.value);
@@ -24,15 +35,19 @@ const NewEventForm = () => {
     setEndDate(e.target.value);
   };
 
+  const handleAdminChange = (e) => {
+    console.log("Admin ", e.target.value);
+    setSelectedAdmin(e.target.value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !startDate || !endDate) {
+    if (!name || !startDate || !endDate || !selectedAdmin) {
       setFormError("Please fill all fields.");
       return;
     }
 
-    // Convert start and end dates to Indian Standard Time (IST)
     const indiaTimeZone = "Asia/Kolkata";
     const format = "YYYY-MM-DDTHH:mm";
     const convertedStartDate = moment
@@ -42,17 +57,17 @@ const NewEventForm = () => {
 
     const today = moment().tz(format, indiaTimeZone).format();
 
-    if(convertedStartDate < today){
+    if (convertedStartDate < today) {
       toast.error("Start date must be after current date");
-      setStartDate("")
-      setEndDate("")
+      setStartDate("");
+      setEndDate("");
       return;
     }
 
     if (!(convertedStartDate < convertedEndDate)) {
       toast.error("Start date must be before end date");
-      setStartDate("")
-      setEndDate("")
+      setStartDate("");
+      setEndDate("");
       return;
     }
     console.log(
@@ -69,6 +84,7 @@ const NewEventForm = () => {
           name,
           startDate: convertedStartDate,
           endDate: convertedEndDate,
+          admin2Id: selectedAdmin,
         }),
       });
 
@@ -122,9 +138,21 @@ const NewEventForm = () => {
               />
             </Form.Group>
 
+            <Form.Group controlId="formBasicAdmin">
+              <Form.Label>Assigned to:</Form.Label>
+              <Form.Select value={selectedAdmin} onChange={handleAdminChange}>
+                <option value="">Select Name</option>
+                {admins2.map((admin) => (
+                  <option key={admin._id} value={admin._id}>
+                    {admin.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+
             {formError && <p className="text-danger">{formError}</p>}
 
-            <Button variant="primary" type="submit">
+            <Button variant="primary" type="submit" style={{ marginTop: '20px' }} >
               Create Event
             </Button>
           </Form>

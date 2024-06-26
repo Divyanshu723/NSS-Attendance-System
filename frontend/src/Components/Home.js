@@ -5,7 +5,8 @@ import { Button } from "react-bootstrap";
 import * as XLSX from "xlsx";
 import { backend_url } from "./services";
 
-function Home() {
+function Home({ adminId }) {
+
   const [AttendanceData, setAttendanceData] = useState(null);
   const [filteredEntries, setFilteredEntries] = useState([]);
   const [entriesToShow, setEntriesToShow] = useState(10);
@@ -16,27 +17,30 @@ function Home() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [adminId]);
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${backend_url}/showEvents`);
-      const responseData = await response.json();
+      if (adminId) {
+        const response = await fetch(`${backend_url}/showEvents/${adminId}`);
+        const responseData = await response.json();
 
-      setAttendanceData(responseData);
+        setAttendanceData(responseData);
 
-      const ActivedisplayedEntries = responseData.filter(
-        (event) => new Date(event.endDate) >= new Date()
-      );
+        const ActivedisplayedEntries = responseData?.filter(
+          (event) => new Date(event.endDate) >= new Date()
+        );
 
-      setActiveEventsEnteries(ActivedisplayedEntries);
-      console.log("activeEventsEnteries are: ", activeEventsEnteries);
-      const PastdislayedEnteries = responseData.filter(
-        (event) => new Date(event.endDate) < new Date()
-      );
+        setActiveEventsEnteries(ActivedisplayedEntries);
+        console.log("activeEventsEnteries are: ", ActivedisplayedEntries);
+        const PastdislayedEnteries = responseData?.filter(
+          (event) => new Date(event.endDate) < new Date()
+        );
 
-      setPastEventEnteries(PastdislayedEnteries);
-      setFilteredEntries(PastdislayedEnteries);
+        setPastEventEnteries(PastdislayedEnteries);
+        setFilteredEntries(PastdislayedEnteries);
+      }
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -58,7 +62,7 @@ function Home() {
   };
 
   const handleNextPage = () => {
-    const totalPages = Math.ceil(filteredEntries.length / entriesToShow);
+    const totalPages = Math.ceil(filteredEntries?.length / entriesToShow);
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
@@ -70,7 +74,7 @@ function Home() {
     if (searchQuery === "") {
       setFilteredEntries(pastEventEntries);
     } else {
-      const filteredData = pastEventEntries.filter((event) =>
+      const filteredData = pastEventEntries?.filter((event) =>
         event.eventName.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredEntries(filteredData);
@@ -126,7 +130,7 @@ function Home() {
   };
 
   const formatDate = (dateString) => {
-    console.log(dateString);
+    // console.log(dateString);
     return formatDateTime(dateString);
   };
 
@@ -201,10 +205,11 @@ function Home() {
               <th>Event Name</th>
               <th>Start Date</th>
               <th>End Date</th>
+              <th>Assigned To </th>
             </tr>
           </thead>
           <tbody>
-            {activeEventsEnteries.map((event, index) => (
+            {activeEventsEnteries?.map((event, index) => (
               <tr
                 key={index}
                 style={{
@@ -220,6 +225,7 @@ function Home() {
                 </td>
                 <td>{formatDate(event.startDate)}</td>
                 <td>{formatDate(event.endDate)}</td>
+                <td>{event?.assignedTo?.name}</td>
               </tr>
             ))}
           </tbody>
@@ -303,6 +309,7 @@ function Home() {
               <th>Event Name</th>
               <th>Start Date</th>
               <th>End Date</th>
+              <th>Assigned To</th>
             </tr>
           </thead>
           <tbody>
@@ -323,6 +330,7 @@ function Home() {
 
                 <td>{formatDate(event.startDate)}</td>
                 <td>{formatDate(event.endDate)}</td>
+                <td>{event?.assignedTo?.name}</td>
               </tr>
             ))}
           </tbody>
@@ -334,8 +342,8 @@ function Home() {
           <div className="row">
             <div className="col-12 d-flex justify-content-between align-items-center">
               <div className="mb-2">
-                Showing <b>{displayedEntries.length}</b> out of{" "}
-                <b>{pastEventEntries.length}</b> entries
+                Showing <b>{displayedEntries?.length}</b> out of{" "}
+                <b>{pastEventEntries?.length}</b> entries
               </div>
               <ul className="pagination">
                 <li className="page-item" onClick={handlePreviousPage}>

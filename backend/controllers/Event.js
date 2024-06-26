@@ -5,10 +5,16 @@ const moment = require("moment-timezone");
 
 //Create a new event
 exports.addEvent = async (req, res) => {
-    const { name, startDate, endDate } = req.body;
+    const { name, startDate, endDate, admin2Id } = req.body;
     // console.log(startDate + " " + endDate);
 
     try {
+
+        // check validation
+        if (!name || !startDate || !endDate || !admin2Id) {
+            return res.json({ success: false, message: "Please fill all fields" });
+        }
+
         // Convert start and end dates to Indian Standard Time (IST) using moment-timezone
         const indiaTimeZone = "Asia/Kolkata";
         const format = "YYYY-MM-DDTHH:mm";
@@ -22,9 +28,16 @@ exports.addEvent = async (req, res) => {
             eventName: name,
             startDate: convertedStartDate,
             endDate: convertedEndDate,
+            assignedTo: admin2Id,
         });
 
         await event.save();
+
+        // Check if admin exists and push the event to the admin's assigned events
+        const admin = await Admin.findById(admin2Id);
+        admin.event.push(event._id);
+        await admin.save();
+
         res.json({ success: true, message: "Event created successfully" });
     } catch (error) {
         console.error("Error saving event:", error);
@@ -34,8 +47,26 @@ exports.addEvent = async (req, res) => {
 
 // Show All Events
 exports.showEvents = async (req, res) => {
-    const eventData = await Event.find();
+
+    const { userId } = req.params;
+    console.log("event ID------", userId);
+
     try {
+        // check admin exists or not 
+        const admin = await Admin.findById(userId);
+        if (!admin) {
+            return res.json({ success: false, message: "Admin not found" });
+        }
+
+        let eventData;
+
+        // check type of admin
+        if (admin.adminType !== "Admin2") {
+            eventData = await Event.find().populate("assignedTo");
+        } else {
+            eventData = await Event.find({ assignedTo: userId }).populate("assignedTo");
+        }
+
         if (eventData) {
             res.json(eventData);
         }
@@ -50,26 +81,41 @@ exports.showEvents = async (req, res) => {
 // Update the event
 exports.updateEvent = async (req, res) => {
     const { id } = req.params;
-    console.log(id);
-    console.log("/updateEvent");
+    const { admin2Id, eventName, startDate, endDate } = req.body;
 
     try {
         const event = await Event.findOne({ _id: id });
-        console.log(event);
 
         if (!event) {
             return res.json({ success: false, message: "Event not found" });
         }
 
+        const oldAdmin2Id = event.assignedTo;
+
+        // check old and new admin2Id are same or not
+        if (oldAdmin2Id.toString() !== admin2Id.toString()) {
+            const oldAdmin = await Admin.findById(oldAdmin2Id)
+            const newAdmin = await Admin.findById(admin2Id)
+            if (!oldAdmin || !newAdmin) {
+                return res.json({ success: false, message: "Admin not found" });
+            }
+
+            // Remove event from old admin's assigned events
+            oldAdmin.event = oldAdmin.event.filter((eventId) => eventId.toString() !== id);
+            await oldAdmin.save();
+
+            // Add event to new admin's assigned events
+            newAdmin.event.push(id);
+            await newAdmin.save();
+        }
+
         // Convert startDate and endDate to Indian Standard Time (IST)
         const indiaTimeZone = "Asia/Kolkata";
-        event.eventName = req.body.eventName;
-        event.startDate = moment.tz(req.body.startDate, indiaTimeZone).toDate();
-        event.endDate = moment.tz(req.body.endDate, indiaTimeZone).toDate();
+        event.eventName = eventName;
+        event.startDate = moment.tz(startDate, indiaTimeZone).toDate();
+        event.endDate = moment.tz(endDate, indiaTimeZone).toDate();
+        event.assignedTo = admin2Id; // Update assignedTo field
 
-        console.log(
-            "hello " + event.eventName + "  " + event.startDate + "  " + event.endDate
-        );
         await event.save();
 
         res.json({ success: true, message: "Event updated successfully" });
@@ -85,6 +131,13 @@ exports.deleteEvent = async (req, res) => {
     console.log(id);
 
     try {
+        // remove from admin's assigned events
+        const event = await Event.findById(id);
+        const admin = await Admin.findById(event.assignedTo);
+        admin.event = admin.event.filter((eventId) => eventId.toString() !== id);
+        await admin.save();
+
+
         const deletedEvent = await Event.findByIdAndRemove(id);
         if (deletedEvent) {
             return res.json({ success: true, message: "Event deleted successfully" });

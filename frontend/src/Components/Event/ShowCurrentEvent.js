@@ -7,7 +7,7 @@ import { Button, Modal } from "react-bootstrap";
 import * as XLSX from "xlsx";
 import { backend_url } from "../services";
 
-const ShowEvent = () => {
+const ShowEvent = ({ adminId }) => {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
   const [userData, setUserData] = useState([]);
@@ -29,12 +29,11 @@ const ShowEvent = () => {
 
   const fetchEvent = async () => {
     try {
-      const response = await fetch(`${backend_url}/showEvents`);
+      const response = await fetch(`${backend_url}/showEvents/${adminId}`);
       const data = await response.json();
       console.log(data);
       const event = data.find((event) => event._id === id);
       setEvent(event);
-      console.log(event, "h");
     } catch (error) {
       console.error("Error fetching event data:", error);
     }
@@ -288,6 +287,9 @@ const ShowEvent = () => {
             <Col xs={12} md={6}>
               <div>
                 <h3 className="text-center">{event.eventName}</h3>
+                <p className="text-center">
+                  <strong>Assigned To:</strong> {event?.assignedTo?.name}
+                </p>
                 <p className="text-center">
                   <strong>Start Date:</strong> {formatDate(event.startDate)}
                 </p>

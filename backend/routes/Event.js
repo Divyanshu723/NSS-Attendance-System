@@ -15,7 +15,7 @@ const {
 router.post("/addEvent",addEvent)
 
 //Route to show all events
-router.get("/showEvents",showEvents)
+router.get("/showEvents/:userId",showEvents)
 
 //Route to update an event
 router.put("/updateEvent/:id",updateEvent)

@@ -6,7 +6,7 @@ import { PencilFill, TrashFill } from "react-bootstrap-icons";
 import moment from "moment-timezone";
 import { backend_url } from "../services";
 
-const AdminHeader = () => {
+const AdminHeader = ({ adminId }) => {
   const [AttendanceData, setAttendanceData] = useState(null);
   const [filteredEntries, setFilteredEntries] = useState(null);
   const [ActiveEventsEnteries, setActiveEventsEnteries] = useState(null);
@@ -21,13 +21,25 @@ const AdminHeader = () => {
   const [selectedEventIdToEdit, setSelectedEventIdToEdit] = useState("");
   const [formDataInEditModel, setFormDataInEditModel] = useState({});
 
-  const initialState = {
-    name: "",
-    startDate: "",
-    endDate: "",
-  };
+  const [admins2, setAdmins2] = useState([]);
 
-  const [formData, setFormData] = useState(initialState);
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      const response = await fetch(`${backend_url}/showAdmins`);
+      const responseData = await response.json();
+      const admin2 = responseData.filter((admin) => admin.adminType === "Admin2");
+      setAdmins2(admin2);
+    };
+    fetchAdmins();
+  }, []);
+
+  // const initialState = {
+  //   name: "",
+  //   startDate: "",
+  //   endDate: "",
+  // };
+
+  // const [formData, setFormData] = useState(initialState);
 
   useEffect(() => {
     fetchData();
@@ -35,10 +47,20 @@ const AdminHeader = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${backend_url}/showEvents`);
+      const response = await fetch(`${backend_url}/showEvents/${adminId}`);
       const responseData = await response.json();
-      setAttendanceData(responseData);
-      const ActivedisplayedEntries = responseData.filter(
+
+      // Modify the responseData to include only the assignedTo ID
+      // Modify each object in the responseData array to include only the assignedTo ID
+      const modifiedResponseData = responseData.map(event => ({
+        ...event,
+        admin2Id: event.assignedTo._id
+      }));
+      console.log("Modify data", modifiedResponseData);
+      
+
+      setAttendanceData(modifiedResponseData);
+      const ActivedisplayedEntries = modifiedResponseData.filter(
         (event) => new Date(event.endDate) >= new Date()
       );
       setActiveEventsEnteries(ActivedisplayedEntries);
@@ -128,7 +150,7 @@ const AdminHeader = () => {
   };
 
   const formatDate = (dateString) => {
-    console.log(dateString);
+    // console.log(dateString);
     return formatDateTime(dateString);
   };
 
@@ -232,12 +254,12 @@ const AdminHeader = () => {
   };
 
   const handleInputChangeInEditModel = (e) => {
-    console.log(e.target.value);
+    console.log("name is", e.target.name ," value is" ,e.target.value);
     setFormDataInEditModel({
       ...formDataInEditModel,
       [e.target.name]: e.target.value,
     });
-    // console.log(formDataInEditModel);
+    console.log("Edited Form data->", formDataInEditModel);
   };
 
   return (
@@ -319,6 +341,7 @@ const AdminHeader = () => {
                   <th>Event Name</th>
                   <th>Start Date Time</th>
                   <th>End Date Time</th>
+                  <th>Assigned To</th>
                   <th>Edit</th>
                   <th>Delete</th>
                 </tr>
@@ -334,6 +357,7 @@ const AdminHeader = () => {
                     </td>
                     <td>{formatDate(student.startDate)}</td>
                     <td>{formatDate(student.endDate)}</td>
+                    <td>{student?.assignedTo?.name}</td>
 
                     <td>
                       {/* <PencilFill size={24} style={{ color: 'blue' }} /> */}
@@ -409,11 +433,9 @@ const AdminHeader = () => {
                     <input
                       type="datetime-local"
                       id="startDate"
-                      class="form-control"
+                      className="form-control"
                       name="startDate"
-                      value={formatDateTimePickerEdiit(
-                        formDataInEditModel.startDate
-                      )}
+                      value={formatDateTimePickerEdiit(formDataInEditModel.startDate)}
                       onChange={handleInputChangeInEditModel}
                     />
                   </div>
@@ -423,13 +445,30 @@ const AdminHeader = () => {
                     <input
                       type="datetime-local"
                       id="endDate"
-                      class="form-control"
+                      className="form-control"
                       name="endDate"
-                      value={formatDateTimePickerEdiit(
-                        formDataInEditModel.endDate
-                      )}
+                      value={formatDateTimePickerEdiit(formDataInEditModel.endDate)}
                       onChange={handleInputChangeInEditModel}
                     />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="admin2Id">Assigned to</label>
+                    <select
+                      id="admin2Id"
+                      className="form-control"
+                      name="admin2Id"
+                      value={formDataInEditModel.admin2Id}
+                      onChange={handleInputChangeInEditModel}
+                      defaultValue={formDataInEditModel.admin2Id}
+                    >
+                      {/* <option value="">Select Name</option> */}
+                      {admins2.map((admin) => (
+                        <option key={admin._id} value={admin._id}>
+                          {admin.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <Modal.Footer>
@@ -440,12 +479,13 @@ const AdminHeader = () => {
                       Cancel
                     </Button>
                     <Button variant="primary" type="submit">
-                      Edit
+                      Save
                     </Button>
                   </Modal.Footer>
                 </form>
               </Modal.Body>
             </Modal>
+
 
             <div className="panel-footer">
               <div className="container">

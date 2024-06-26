@@ -199,7 +199,7 @@ exports.addAdmin = async (req, res) => {
             year,
         });
         await admin.save();
-        res.json({ success: true, message: "Admin created successfully" });
+        res.json({ success: true, message: "Admin created successfully", admin });
     } catch (error) {
         res.json({ success: false, message: "Error occured" });
     }

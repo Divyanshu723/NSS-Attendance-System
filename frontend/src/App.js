@@ -29,6 +29,7 @@ const App = () => {
   const[isAdmin1, setIsAdmin1] = useState(false);
   const[isAdmin2, setIsAdmin2] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [adminId, setAdminId] = useState('');
   const location = useLocation();
 
   const fetchAuthStatus = async () => {
@@ -47,6 +48,7 @@ const App = () => {
     else if(admin2){
       setIsAdmin2(true);
     }
+      setAdminId(list[2]); // set the admin id
   } catch (error) {
     console.error('Error checking authentication:', error);
   } finally {
@@ -75,18 +77,18 @@ const App = () => {
     {/* <Router> */}
       <CustomNavbar isAuthenticated={isAuthenticated} admin1={isAdmin1} admin2={isAdmin2}/>
       <Routes>
-        <Route path="/" exact={true} element={isAuthenticated ? <Home /> : <Navigate to="/login" />} />
-        <Route path="/login" element={<Login setIsPartialAuthenticated={setIsPartialAuthenticated} setUserEmail={setUserEmail} />} />
+        <Route path="/" exact={true} element={isAuthenticated ? <Home adminId={adminId}/> : <Navigate to="/login" />} />
+        <Route path="/login" element={!isAuthenticated ? <Login setIsPartialAuthenticated={setIsPartialAuthenticated} setUserEmail={setUserEmail} /> : <Navigate to="/" />} />
         {/* <Route path="/addAdmin" element={(isAuthenticated && isAdmin1) ? <AddAdmin/> : <Login/>} /> */}
         {/* For OTP */}
         <Route path='/verify-email' element={isPartialAuthenticated ? <VerifyEmail userEmail={userEmail} setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" /> } />
-        <Route path="/showAdmins" element={(isAuthenticated && isAdmin1) ? <ShowAdmins /> : <Navigate to="/login" />} />
-        <Route path="/addEvent" element={(isAuthenticated && isAdmin1) ? <AddEvent /> : <Navigate to="/login" />} />
-        <Route path="/showCurrentEvents" element={(isAuthenticated && isAdmin1) ? <CurrentEvent /> : <Navigate to="/login" />} />
-        <Route path="/showPastEvents" element={(isAuthenticated && isAdmin1) ? <PastEvent /> : <Navigate to="/login" />} />
-        <Route path="/showCurrentEvent/:id" element={(isAuthenticated) ? <ShowCurrentEvent /> : <Navigate to="/login" />} />
-        <Route path="/showPastEvent/:id" element={(isAuthenticated) ? <ShowPastEvent /> : <Navigate to="/login" />} />
-        <Route path="/showUsers" element={(isAuthenticated && isAdmin1) ? <ShowUsers /> : <Navigate to="/login" />} />
+        <Route path="/showAdmins" element={(isAuthenticated && isAdmin1) ? <ShowAdmins /> : <Navigate to="/" />} />
+        <Route path="/addEvent" element={(isAuthenticated && isAdmin1) ? <AddEvent /> : <Navigate to="/" />} />
+        <Route path="/showCurrentEvents" element={(isAuthenticated && isAdmin1) ? <CurrentEvent adminId={adminId} /> : <Navigate to="/" />} />
+        <Route path="/showPastEvents" element={(isAuthenticated && isAdmin1) ? <PastEvent adminId={adminId} /> : <Navigate to="/" />} />
+        <Route path="/showCurrentEvent/:id" element={(isAuthenticated) ? <ShowCurrentEvent adminId={adminId} /> : <Navigate to="/" />} />
+        <Route path="/showPastEvent/:id" element={(isAuthenticated) ? <ShowPastEvent adminId={adminId} /> : <Navigate to="/" />} />
+        <Route path="/showUsers" element={(isAuthenticated && isAdmin1) ? <ShowUsers /> : <Navigate to="/" />} />
         <Route path="*" element={<NotFound404 />} />
       </Routes>
     {/* </Router> */}

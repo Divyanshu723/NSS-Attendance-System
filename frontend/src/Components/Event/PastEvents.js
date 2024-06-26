@@ -8,7 +8,7 @@ import { backend_url } from "../services";
 
 // import * as XLSX from 'xlsx';
 
-const AdminHeader = () => {
+const AdminHeader = ({ adminId }) => {
   const [AttendanceData, setAttendanceData] = useState(null);
   const [filteredEntries, setFilteredEntries] = useState(null);
   const [PastEventsEnteries, setPastEventsEnteries] = useState(null);
@@ -37,7 +37,7 @@ const AdminHeader = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${backend_url}/showEvents`);
+      const response = await fetch(`${backend_url}/showEvents/${adminId}`);
       const responseData = await response.json();
       setAttendanceData(responseData);
       const ActivedisplayedEntries = responseData.filter(
@@ -320,6 +320,7 @@ const AdminHeader = () => {
                   <th>Event Name</th>
                   <th>Start Date Time</th>
                   <th>End Date Time</th>
+                  <th>Assigned To</th>
                   <th>Edit</th>
                   <th>Delete</th>
                 </tr>
@@ -335,6 +336,7 @@ const AdminHeader = () => {
                     </td>
                     <td>{formatDate(student.startDate)}</td>
                     <td>{formatDate(student.endDate)}</td>
+                    <td>{student?.assignedTo?.name}</td>
 
                     <td>
                       <PencilFill

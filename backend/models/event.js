@@ -13,6 +13,11 @@ const eventSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  assignedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Admin",
+    required: true,
+  },
 });
 
 const Event = mongoose.model("Event", eventSchema);

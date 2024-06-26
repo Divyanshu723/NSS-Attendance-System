@@ -20,7 +20,7 @@ export const checkAuth = async () => {
 
       console.log(data.adminType);
 
-      const list = [data.success, data.adminType];
+      const list = [data.success, data.adminType, data.adminId];
       return list;
     }
 
