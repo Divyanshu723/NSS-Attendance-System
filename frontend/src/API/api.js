@@ -18,9 +18,10 @@ export const checkAuth = async () => {
     if (response.ok) {
       const data = await response.json();
 
-      console.log(data.adminType);
+      // console.log(data.adminType);
 
       const list = [data.success, data.adminType, data.adminId];
+      console.log("LIST: ", list);
       return list;
     }
 
@@ -32,7 +33,7 @@ export const checkAuth = async () => {
   }
 };
 
-export async function sendOtp(email, navigate) {
+export async function sendOtp(email, navigate, isAdmin) {
   const toastId = toast.loading("Loading...");
   console.log("OTP Frontedn");
   try {
@@ -41,7 +42,7 @@ export async function sendOtp(email, navigate) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, isAdmin }),
     });
 
     if (!response.ok) {
@@ -55,7 +56,8 @@ export async function sendOtp(email, navigate) {
 
     console.log("OTP DATA", data);
     toast.success("OTP Sent Successfully");
-    navigate('/verify-email');
+    // TODO :: YHA TAK HUA HAI AAJ KL YHI SE RESUME KRENGE (isAdmin ko pass krna hai verify-email page pe... so stay tuned.....)
+    navigate(`/verify-email/${isAdmin}`);
   } catch (error) {
     console.error("Error sending OTP:", error);
     toast.error("Failed to send OTP. Please try again later.");
@@ -64,7 +66,7 @@ export async function sendOtp(email, navigate) {
   }
 }
 
-export async function checkOTP(email, otp, navigate) {
+export async function checkOTP(email, otp, isAdmin) {
   const toastId = toast.loading("Loading...");
   try {
     const response = await fetch(`${backend_url}/checkOTP`, {
@@ -72,12 +74,8 @@ export async function checkOTP(email, otp, navigate) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, otp }),
+      body: JSON.stringify({ email, otp, isAdmin }),
     });
-
-    // if (!response.ok) {
-    //   throw new Error("Failed check OTP. Please try again later.");
-    // }
 
     const data = await response.json();
     if (!data.success) {

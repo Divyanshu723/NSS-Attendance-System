@@ -98,3 +98,6 @@ exports.deleteUser = async (req, res) => {
         });
     }
 }
+
+
+// get user details by id

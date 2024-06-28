@@ -18,15 +18,15 @@ const adminSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  course: {
+    type: String,
+    required: true,
+  },
   position: {
     type: String,
     required: true,
   },
   adminType: {
-    type: String,
-    required: true,
-  },
-  course: {
     type: String,
     required: true,
   },

@@ -11,10 +11,8 @@ const SECRET_KEY = process.env.secretKey;
 //login
 exports.login = async (req, res) => {
     try {
-        // console.log("Secret Key is : ", secretKey);
-        console.log("req: ", req);
-        console.log("Andr aagye ji");
-        const { email, password } = req.body;
+        const { email, password, isAdmin } = req.body;
+        console.log("IS ADMIN---->", isAdmin);
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -22,29 +20,37 @@ exports.login = async (req, res) => {
             })
         }
 
-        const admin = await Admin.findOne({ email });
-        console.log("Admin: ", admin);
+       if(isAdmin){
+           const admin = await Admin.findOne({ email });
 
-        if (!admin) {
-            console.log("Good");
-            return res.status(401).json({
-                success: false,
-                message: `Admin is not Registered with Us Please SignUp to Continue`,
-            })
-        }
+           if (!admin) {
+               console.log("Good");
+               return res.status(401).json({
+                   success: false,
+                   message: `Admin is not Registered with Us Please SignUp to Continue`,
+               })
+           }
 
-        if (await bcrypt.compare(password, admin.password)) {
-            console.log("Hogya compare");
-            // // // Verify and decode the token
-            // const decodedToken = jwt.verify(token, secretKey);
-            // // Access the value of isAdmin from the decoded token
-            // const isAdmin = decodedToken.adminType;
-            // console.log(decodedToken, isAdmin);
+           if (await bcrypt.compare(password, admin.password)) {
+               res.json({ success: true, message: "Login successful" });
+           } else {
+               res.json({ success: false, message: "Invalid credentials" });
+           }
+       } else{
+          const user = await User.findOne({ email });
 
-            res.json({ success: true, message: "1st Part of Login successful" });
-        } else {
-            res.json({ success: false, message: "Invalid credentials" });
-        }
+            if (!user) {
+                return res.status(401).json({
+                    success: false,
+                    message: `User is not Registered with Us Please SignUp to Continue`,
+                })
+            }
+            if (await bcrypt.compare(password, user.password)) {
+                res.json({ success: true, message: "Login successful" });
+            } else {
+                res.json({ success: false, message: "Invalid credentials" });
+            }
+       }
     } catch (error) {
         res.status(500).json({ success: false, message: "An error occurred" });
     }
@@ -54,12 +60,20 @@ exports.login = async (req, res) => {
 exports.sendotp = async (req, res) => {
     console.log("BACK OTP");
     try {
-        const { email } = req.body;
+        const { email, isAdmin } = req.body;
         console.log("Email: " + email);
 
         // Check if user is already present
         // Find user with provided email
-        const checkUserPresent = await Admin.findOne({ email });
+        let checkUserPresent;
+       if(isAdmin){
+            checkUserPresent = await Admin.findOne({ email });
+       }
+       else{
+            console.log("Check kr rha h");
+            checkUserPresent = await User.findOne({ email });
+
+       }
         // to be used in case of signup
         console.log("User check: " + checkUserPresent);
         // If user found with provided email
@@ -103,7 +117,7 @@ exports.sendotp = async (req, res) => {
 // Check OTP is correct or not
 exports.checkOTP = async (req, res) => {
     try {
-        const { email, otp } = req.body;
+        const { email, otp, isAdmin } = req.body;
         
         if (!email || !otp) {
             return res.status(500).json({
@@ -112,9 +126,14 @@ exports.checkOTP = async (req, res) => {
             });
          }
 
-        // Check if user is already present
-        // Find user with provided email
-        const checkUserPresent = await Admin.findOne({ email });
+        let checkUserPresent;
+        if(isAdmin === 'true'){
+            console.log("Email: ", email);
+            checkUserPresent = await Admin.findOne({ email });
+        }else{
+            checkUserPresent = await User.findOne({email});
+        }
+        
         // to be used in case of signup
         console.log("User check: " + checkUserPresent);
         // If user found with provided email
@@ -145,11 +164,20 @@ exports.checkOTP = async (req, res) => {
         }
 
         // Token generated
-        const token = jwt.sign(
-            { email: checkUserPresent.email, adminType: checkUserPresent.adminType },
-            SECRET_KEY,
-            { expiresIn: "24h" } // Token expires in 24 hours
-        );
+        let token;
+        if(isAdmin === 'true'){
+               token = jwt.sign(
+                { email: checkUserPresent.email, adminType: checkUserPresent.adminType, isAdmin: true },
+                SECRET_KEY,
+                { expiresIn: "24h" } // Token expires in 24 hours
+            );
+        }else{
+               token = jwt.sign(
+                { email: checkUserPresent.email, isAdmin: false},
+                SECRET_KEY,
+                { expiresIn: "24h" } // Token expires in 24 hours
+            );
+        }
 
         return res.status(200).json({
             success: true,
@@ -157,7 +185,8 @@ exports.checkOTP = async (req, res) => {
             token
         })
     } catch (error) {
-        
+        console.log(error.message);
+        return res.status(500).json({ success: false, error: error.message, message: "Something went wrong" });
     }
 }
 

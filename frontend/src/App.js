@@ -1,7 +1,6 @@
 import "./App.css";
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
-
 import Login from './Components/Login';
 import Home from './Components/Home';
 import CustomNavbar from './Components/Partial/Navbar';
@@ -18,6 +17,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 // Import the authentication API functions
 import { checkAuth } from './API/api';
 import VerifyEmail from './Components/VerifyEmail';
+import Dashboard from "./Components/Dashboard";
 
 
 const App = () => {
@@ -28,25 +28,34 @@ const App = () => {
   const [userEmail, setUserEmail] = useState("")
   const[isAdmin1, setIsAdmin1] = useState(false);
   const[isAdmin2, setIsAdmin2] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [adminId, setAdminId] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+  
   const location = useLocation();
 
   const fetchAuthStatus = async () => {
+    setLoading(true);
     try {
       const list = await checkAuth();
-      console.log("List : ", list);
-    const isAuthenticated = list[0];
+      const isAuthenticated = list[0];
+      console.log("IS AUTHENTICATED: ", isAuthenticated);
 
     const admin1 = (list[1] === 'Admin1' ? true : false);
     const admin2 = (list[1] === 'Admin2' ? true : false);
 
+    
     setIsAuthenticated(isAuthenticated);
     if(admin1){
       setIsAdmin1(true);
+      setIsAdmin(true);
     }
     else if(admin2){
       setIsAdmin2(true);
+      setIsAdmin(true);
+    }
+    else{
+      setIsAdmin(false);
     }
       setAdminId(list[2]); // set the admin id
   } catch (error) {
@@ -60,16 +69,14 @@ const App = () => {
   useEffect(() => {
     // Initial authentication check
     fetchAuthStatus();
-  }, []); // Run once on component mount
-
-  useEffect(() => {
-    // Authentication check on every route change
-    fetchAuthStatus();
-  }, [location.pathname]); // Run on route change
+  }, [location.pathname],); // Run once on component mount or Run on route change
 
   if (loading) {
     return <p>Loading...</p>; // You can replace this with your loading component
   }
+
+  console.log("Isadmin current status-->", isAdmin);
+  console.log("ADMIN ID", adminId);
 
 
   return (
@@ -77,11 +84,12 @@ const App = () => {
     {/* <Router> */}
       <CustomNavbar isAuthenticated={isAuthenticated} admin1={isAdmin1} admin2={isAdmin2}/>
       <Routes>
-        <Route path="/" exact={true} element={isAuthenticated ? <Home adminId={adminId}/> : <Navigate to="/login" />} />
-        <Route path="/login" element={!isAuthenticated ? <Login setIsPartialAuthenticated={setIsPartialAuthenticated} setUserEmail={setUserEmail} /> : <Navigate to="/" />} />
+        <Route path="/" exact={true} element={isAuthenticated ? (!isAdmin ? <Navigate to="/dashboard" /> : <Home adminId={adminId} />)  : <Navigate to="/login" />} />
+        <Route path="/dashboard" element={isAuthenticated ? (isAdmin ? <Navigate to="/" /> : <Dashboard userId={adminId} />): <Navigate to = "/login" /> }/>
+        <Route path="/login" element={!isAuthenticated ? <Login setIsPartialAuthenticated={setIsPartialAuthenticated} setUserEmail={setUserEmail} isAdmin={isAdmin} setIsAdmin={setIsAdmin} /> : <Navigate to="/" />} />
         {/* <Route path="/addAdmin" element={(isAuthenticated && isAdmin1) ? <AddAdmin/> : <Login/>} /> */}
         {/* For OTP */}
-        <Route path='/verify-email' element={isPartialAuthenticated ? <VerifyEmail userEmail={userEmail} setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" /> } />
+        <Route path='/verify-email/:isAdmin' element={isPartialAuthenticated ? <VerifyEmail userEmail={userEmail} setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" /> } />
         <Route path="/showAdmins" element={(isAuthenticated && isAdmin1) ? <ShowAdmins /> : <Navigate to="/" />} />
         <Route path="/addEvent" element={(isAuthenticated && isAdmin1) ? <AddEvent /> : <Navigate to="/" />} />
         <Route path="/showCurrentEvents" element={(isAuthenticated && isAdmin1) ? <CurrentEvent adminId={adminId} /> : <Navigate to="/" />} />

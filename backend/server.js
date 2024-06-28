@@ -19,10 +19,7 @@ const CORS_URL = process.env.CORS_URL;
 const port = process.env.PORT || 8000;
 
 const moment = require("moment-timezone");
-// Assuming you have the necessary imports and setup for the Event model
-
-// Generate a secure secret key
-// const secretKey = process.env.secretKey;
+const User = require("./models/user");
 
 
 // Middlewares
@@ -44,17 +41,25 @@ router.get("/checkAuth", async (req, res) => {
   }
   else {
     const decodedToken = jwt.decode(token);
+    const isAdmin = decodedToken?.isAdmin;
     const adminType = decodedToken?.adminType;
-    const adminEmail = decodedToken?.email;
-    const admin = await Admin.findOne({ email: adminEmail });
-    if (!admin) {
+    const email = decodedToken?.email;
+    let person;
+    console.log("IS admin->>>>>>>>>>", isAdmin);
+    console.log(typeof isAdmin);
+    if(isAdmin){
+      person = await Admin.findOne({ email: email });
+    }
+    else{
+      person = await User.findOne({email: email});
+    }
+    if (!person) {
       return res.json({ success: false, message: "User Not found" });
     }
-    console.log("ADMIN->", admin);
     return res.json({
       success: true,
-      adminType: adminType,
-      adminId: admin._id,
+      adminType: isAdmin ?   adminType : "",
+      adminId: person._id,
       message: "Already Logged In",
     });
   }
