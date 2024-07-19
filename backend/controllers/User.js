@@ -1,4 +1,4 @@
-const Admin = require("../models/admin");
+const Event = require("../models/event");
 const User = require("../models/user");
 
 //Create a new user
@@ -99,5 +99,49 @@ exports.deleteUser = async (req, res) => {
     }
 }
 
-
 // get user details by id
+exports.getUserDetailsWithAttendance = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        // Find the user by ID and populate the events array
+        const user = await User.findById(userId).populate({
+            path: 'events',
+            populate: {
+                path: 'assignedTo',
+                select: 'name',
+                model: 'Admin' // Make sure you have an Admin model defined
+            }
+        });
+
+        if (!user) {
+            return res.json({ success: false, message: "User not found" });
+        }
+
+        // Find the total number of events
+        const totalEvents = await Event.countDocuments();
+
+        // Calculate the attendance percentage
+        const attendedEvents = user.events.length;
+        const attendancePercentage = (attendedEvents / totalEvents) * 100;
+
+        // Prepare the response
+        const userDetails = {
+            name: user.name,
+            registrationNumber: user.registrationNumber,
+            email: user.email,
+            course: user.course,
+            branch: user.branch,
+            year: user.year,
+            attendedEvents: user.events,
+            attendancePercentage: attendancePercentage.toFixed(2) // to limit to 2 decimal places
+        };
+
+        return res.json({ success: true, data: userDetails });
+    } catch (error) {
+        return res.json({
+            success: false,
+            message: "Error occurred while fetching user details",
+        });
+    }
+};

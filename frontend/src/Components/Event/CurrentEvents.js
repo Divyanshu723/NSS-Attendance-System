@@ -57,7 +57,7 @@ const AdminHeader = ({ adminId }) => {
         admin2Id: event.assignedTo._id
       }));
       console.log("Modify data", modifiedResponseData);
-      
+
 
       setAttendanceData(modifiedResponseData);
       const ActivedisplayedEntries = modifiedResponseData.filter(
@@ -71,7 +71,13 @@ const AdminHeader = ({ adminId }) => {
   };
 
   if (AttendanceData === null) {
-    return <div>Loading...</div>;
+    return (
+      <div class="d-flex justify-content-center align-items-center text-center" style={{ 'height': '90vh' }}>
+        <div class="spinner-border" style={{ 'height': '3rem', 'width': '3rem' }} role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );;
   }
 
   const handleEntriesToShowChange = (event) => {
@@ -254,7 +260,7 @@ const AdminHeader = ({ adminId }) => {
   };
 
   const handleInputChangeInEditModel = (e) => {
-    console.log("name is", e.target.name ," value is" ,e.target.value);
+    console.log("name is", e.target.name, " value is", e.target.value);
     setFormDataInEditModel({
       ...formDataInEditModel,
       [e.target.name]: e.target.value,

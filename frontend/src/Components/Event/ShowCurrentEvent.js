@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col } from "react-bootstrap";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, Badge } from "react-bootstrap";
 // import { PencilFill, TrashFill } from 'react-bootstrap-icons';
 import * as XLSX from "xlsx";
 import { backend_url } from "../services";
@@ -40,7 +40,7 @@ const ShowEvent = ({ adminId }) => {
   };
 
   const fetchData = async () => {
-    try{
+    try {
       const response = await fetch(`${backend_url}/showUsers`);
       const data = await response.json();
       setUserData(data);
@@ -105,7 +105,13 @@ const ShowEvent = ({ adminId }) => {
   };
 
   if (userData === null) {
-    return <div>Loading...</div>;
+    return (
+      <div class="d-flex justify-content-center align-items-center text-center" style={{ 'height': '90vh' }}>
+        <div class="spinner-border" style={{ 'height': '3rem', 'width': '3rem' }} role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
   const handleEntriesToShowChange = (event) => {
@@ -258,11 +264,6 @@ const ShowEvent = ({ adminId }) => {
       ? filtered_Entries.slice(indexOfFirstEntry, indexOfLastEntry)
       : [];
 
-  // const entriesPerPage = entriesToShow;
-  // const totalPages = Math.ceil(dataLength / entriesToShow);
-  // const indexOfLastEntry = currentPage * entriesToShow;
-  // const indexOfFirstEntry = indexOfLastEntry - entriesToShow;
-  // const displayedEntries = userData.slice(indexOfFirstEntry, indexOfLastEntry);
 
   const pageLinks = [];
   for (let page = 1; page <= totalPages; page++) {
@@ -439,7 +440,7 @@ const ShowEvent = ({ adminId }) => {
                   {/* <th>Participation</th> */}
                   <th>Batch(Year)</th>
                   <th>Attendance Status</th>
-                  <th>Delete</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="tbody">
@@ -452,27 +453,38 @@ const ShowEvent = ({ adminId }) => {
                     <td>{student.year}</td>
 
                     <td>
-                      <button
-                        onClick={() =>
-                          handleAttendance(student?._id, student?.email)
-                        }
-                        disabled={student?.events?.includes(event?._id)}
-                      >
-                        {student?.events?.includes(event?._id)
-                          ? "Present"
-                          : "Absent"}
-                      </button>
+                      {student?.events?.includes(event?._id)
+                        ? (
+                          <Badge bg="success">Present</Badge>
+                        )
+                        : (
+                          <Badge bg="danger">Absent</Badge>
+                        )
+                      }
                     </td>
                     <td>
-                      {/* <TrashFill  size={24} style={{ color: 'red' }} /> */}
-                      <button
-                        onClick={() =>
-                          handleDeleteAttendance(student?._id, student?.email)
-                        }
-                        disabled={!student?.events?.includes(event?._id)}
-                      >
-                        Delete
-                      </button>
+                      {
+                        student?.events?.includes(event?._id) ? (
+                          <Button variant="danger"
+                            onClick={() =>
+                              handleDeleteAttendance(student?._id, student?.email)
+                            }
+                            disabled={!student?.events?.includes(event?._id)}
+                          >
+                            Absent
+                          </Button>
+                        ) : (
+                          <Button variant="success"
+                            onClick={() =>
+                              handleAttendance(student?._id, student?.email)
+                            }
+                          // disabled={student?.events?.includes(event?._id)}
+                          >
+                            Present
+                          </Button>
+                        )
+                      }
+
                     </td>
                   </tr>
                 ))}

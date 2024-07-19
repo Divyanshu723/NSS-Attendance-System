@@ -7,7 +7,8 @@ const {
     addUser,
     showUsers,
     updateUser,
-    deleteUser
+    deleteUser,
+    getUserDetailsWithAttendance
 } = require("../controllers/User")
 
 
@@ -21,7 +22,13 @@ router.get("/showUsers",showUsers)
 router.put("/updateUser/:id",updateUser)
 
 //Route to delete the user
-router.delete("/deleteUser/:id",deleteUser)
+router.delete("/deleteUser/:id", deleteUser)
+
+
+// Router to get details of user by id
+router.get("/getUserDetails/:userId", getUserDetailsWithAttendance);
+
+
 
 module.exports = router
 

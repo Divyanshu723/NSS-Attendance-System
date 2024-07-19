@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col } from "react-bootstrap";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, Badge } from "react-bootstrap";
 // import { PencilFill, TrashFill } from 'react-bootstrap-icons';
 import * as XLSX from "xlsx";
 import { backend_url } from "../services";
@@ -32,7 +32,7 @@ const ShowEvent = ({ adminId }) => {
       console.log(data);
       const event = data.find((event) => event._id === id);
       setEvent(event);
-      console.log(event, "h");
+      console.log("Event->>", event);
     } catch (error) {
       console.error("Error fetching event data:", error);
     }
@@ -51,7 +51,13 @@ const ShowEvent = ({ adminId }) => {
   };
 
   if (userData === null) {
-    return <div>Loading...</div>;
+    return (
+      <div class="d-flex justify-content-center align-items-center text-center" style={{ 'height': '90vh' }}>
+        <div class="spinner-border" style={{ 'height': '3rem', 'width': '3rem' }} role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
   const handleEntriesToShowChange = (event) => {
@@ -178,7 +184,8 @@ const ShowEvent = ({ adminId }) => {
       email: entry.email,
       branch: entry.branch,
       year: entry.year,
-      status: entry.events?.includes(event.eventName) ? "Present" : "Absent",
+      status: entry.events?.includes(event._id) ? "Present" : "Absent",
+      AttendanceBy: event?.assignedTo?.name
     }));
 
     // Convert modified data to worksheet format
@@ -187,7 +194,7 @@ const ShowEvent = ({ adminId }) => {
     // const worksheet = XLSX.utils.json_to_sheet(filtered_Entries);
 
     // Add the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Past Attendance Report");
+    XLSX.utils.book_append_sheet(workbook, worksheet, `${event.eventName} Attendance Report`);
 
     // Generate the Excel file
     const timestamp = Date.now();
@@ -387,14 +394,13 @@ const ShowEvent = ({ adminId }) => {
                     <td>{student?.course}</td>
                     <td>{student?.year}</td>
                     <td>
-                      <button
-                        disabled={student?.events?.includes(event?.eventName)}
-                        style={{ pointerEvents: "none" }}
-                      >
-                        {student?.events?.includes(event?.eventName)
-                          ? "Present"
-                          : "Absent"}
-                      </button>
+                      {
+                        student?.events?.includes(event?._id) ? (
+                          <Badge bg="success">Present</Badge>
+                        ) : (
+                          <Badge bg="danger">Absent</Badge>
+                        )
+                      }
                     </td>
                   </tr>
                 ))}

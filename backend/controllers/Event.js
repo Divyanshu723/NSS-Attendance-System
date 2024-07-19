@@ -60,11 +60,19 @@ exports.showEvents = async (req, res) => {
 
         let eventData;
 
-        // check type of admin
+        // check type of admin select: 'name',
         if (admin.adminType !== "Admin2") {
-            eventData = await Event.find().populate("assignedTo");
+            eventData = await Event.find().populate({
+                path: "assignedTo",
+                select: "name",
+                
+            });
         } else {
-            eventData = await Event.find({ assignedTo: userId }).populate("assignedTo");
+            eventData = await Event.find({ assignedTo: userId }).populate({
+                path: "assignedTo",
+                select: "name",
+
+            });
         }
 
         if (eventData) {
@@ -149,5 +157,24 @@ exports.deleteEvent = async (req, res) => {
             success: false,
             message: "Error occurred while deleting event",
         });
+    }
+}
+
+// Upcoming events
+exports.upcomingEvents = async (req, res) => { 
+    try {
+        const now = new Date();
+        const futureEvents = await Event.find({ startDate: { $gt: now } }).populate({
+            path: "assignedTo",
+            select: "name",
+
+        });;
+
+        res.status(200).json({
+            success: true,
+            data: futureEvents,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 }

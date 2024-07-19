@@ -8,7 +8,8 @@ const {
     addEvent,
     showEvents,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    upcomingEvents
 } = require("../controllers/Event")
 
 //Route for creation of an event
@@ -21,6 +22,9 @@ router.get("/showEvents/:userId",showEvents)
 router.put("/updateEvent/:id",updateEvent)
 
 //Route for deletion of an event
-router.delete("/deleteEvent/:id",deleteEvent)
+router.delete("/deleteEvent/:id", deleteEvent)
+
+// Route for upcomig events
+router.get("/upcomingEvents", upcomingEvents)
 
 module.exports = router

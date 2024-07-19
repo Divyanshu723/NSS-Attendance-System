@@ -1,10 +1,16 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import Home from "./Home";
 import { backend_url } from "./services";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { sendOtp } from '../API/api';
+// import BgImage from '../assets/academic.jpg'
+
+// var sectionStyle = {
+//   backgroundImage: `url(${BgImage})`,
+//   height: '100vh',
+//   width:'100vw'
+// }
 
 function Login({ setIsPartialAuthenticated, setUserEmail, isAdmin, setIsAdmin }) {
   const [email, setEmail] = useState("");

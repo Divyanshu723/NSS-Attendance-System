@@ -51,7 +51,13 @@ const AdminHeader = () => {
 
 
     if (!AttendanceData) {
-        return <div>Loading...</div>;
+        return (
+            <div class="d-flex justify-content-center align-items-center text-center" style={{ 'height': '90vh' }}>
+                <div class="spinner-border" style={{ 'height': '3rem', 'width': '3rem' }} role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
     }
 
 
@@ -284,8 +290,8 @@ const AdminHeader = () => {
 
 
 
-     // edit button model
-     const handleEditButtonModalToggle = () => {
+    // edit button model
+    const handleEditButtonModalToggle = () => {
         setIsEditButtonModalOpen(!isEditButtonModalOpen);
     };
 
@@ -415,20 +421,6 @@ const AdminHeader = () => {
                         {/* end of model for add student */}
                     </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     <div className="row mb-4">
                         <div className="col-sm-6">
                             <div className="dataTables_length bs-select" id="dtBasicExample_length">
@@ -495,14 +487,6 @@ const AdminHeader = () => {
                             </div>
                         </div>
 
-
-
-
-
-
-
-
-
                         {/* search box start */}
                         <div className="col-sm-6 d-flex align-items-center justify-content-end">
                             <form className="form-inline" onSubmit={handleSearchSubmit}>
@@ -556,7 +540,7 @@ const AdminHeader = () => {
                                                 {/* <PencilFill size={24} style={{ color: 'blue', cursor: 'pointer' }} onClick={handleEdit} /> */}
                                             </td>
                                             <td>
-                                                <TrashFill size={24} style={{ color: 'red' }} onClick={() => handleConfirmation(student._id)} />
+                                                <TrashFill size={24} style={{ color: 'red', cursor: 'pointer' }} onClick={() => handleConfirmation(student._id)} />
                                                 {/* <TrashFill size={24} style={{ color: 'red', cursor: 'pointer' }} onClick={handleDelete} /> */}
                                             </td>
 
@@ -590,8 +574,8 @@ const AdminHeader = () => {
                         </Modal>
 
 
-                         {/* Edit Modal */}
-                         <Modal show={isEditButtonModalOpen} onHide={handleEditButtonModalToggle}>
+                        {/* Edit Modal */}
+                        <Modal show={isEditButtonModalOpen} onHide={handleEditButtonModalToggle}>
                             <Modal.Header closeButton>
                                 <Modal.Title>Edit Member</Modal.Title>
                             </Modal.Header>

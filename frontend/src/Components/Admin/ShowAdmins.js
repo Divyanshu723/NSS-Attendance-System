@@ -48,7 +48,13 @@ const AdminHeader = () => {
   };
 
   if (AttendanceData === null) {
-    return <div>Loading...</div>;
+    return (
+      <div class="d-flex justify-content-center align-items-center text-center" style={{ 'height': '90vh' }}>
+        <div class="spinner-border" style={{ 'height': '3rem', 'width': '3rem' }} role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
   const handleEntriesToShowChange = (event) => {

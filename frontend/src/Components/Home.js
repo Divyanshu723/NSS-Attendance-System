@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Button } from "react-bootstrap";
 import * as XLSX from "xlsx";
 import { backend_url } from "./services";
+import toast from 'react-hot-toast';
 
 function Home({ adminId }) {
 
@@ -40,14 +41,20 @@ function Home({ adminId }) {
         setPastEventEnteries(PastdislayedEnteries);
         setFilteredEntries(PastdislayedEnteries);
       }
-      
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   if (AttendanceData === null) {
-    return <div>Loading...</div>;
+    return (
+      <div class="d-flex justify-content-center align-items-center text-center" style={{ 'height': '90vh' }}>
+        <div class="spinner-border" style={{ 'height': '3rem', 'width': '3rem' }} role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );;
   }
 
   const handleEntriesToShowChange = (event) => {
@@ -162,7 +169,34 @@ function Home({ adminId }) {
 
   const handleReportClickActive = () => {
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(activeEventsEnteries);
+
+    // Process the data to update the assignedTo field and format dates
+    const processedEntries = activeEventsEnteries.map((entry, index) => {
+      const { __v,_id, ...rest } = entry; // Destructure to remove __v
+      return {
+        id: index + 1,
+        ...rest,
+        assignedTo: entry.assignedTo ? entry.assignedTo.name : '',
+        startDate: new Date(entry.startDate).toLocaleString('en-GB', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).replace(',', ''),
+        endDate: new Date(entry.endDate).toLocaleString('en-GB', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).replace(',', '')
+      };
+    });
+
+
+    const worksheet = XLSX.utils.json_to_sheet(processedEntries);
+    console.log("worksheet", worksheet);
     XLSX.utils.book_append_sheet(
       workbook,
       worksheet,
@@ -174,7 +208,33 @@ function Home({ adminId }) {
 
   const handleReportClickPast = () => {
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(pastEventEntries);
+
+    // Process the data to update the assignedTo field and format dates
+    const processedEntries = pastEventEntries.map((entry, index) => {
+      const { __v, _id, ...rest } = entry; // Destructure to remove __v
+      return {
+        id: index + 1,
+        ...rest,
+        assignedTo: entry.assignedTo ? entry.assignedTo.name : '',
+        startDate: new Date(entry.startDate).toLocaleString('en-GB', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).replace(',', ''),
+        endDate: new Date(entry.endDate).toLocaleString('en-GB', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).replace(',', '')
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(processedEntries);
+
     XLSX.utils.book_append_sheet(workbook, worksheet, "Past Event List Report");
     const timestamp = Date.now();
     XLSX.writeFile(workbook, `admin_report_${timestamp}.xlsx`);
@@ -219,9 +279,19 @@ function Home({ adminId }) {
                 <td>{indexOfFirstEntry + index + 1}</td>
 
                 <td>
-                  <Link to={`/showCurrentEvent/${event._id}`}>
-                    {event.eventName}
-                  </Link>
+                  {new Date(event.startDate) > new Date() ? (
+                    <p className="text-primary text-decoration-underline"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => toast.error("This is an uncoming event!")} >
+                      {event.eventName}
+                    </p>
+                  ) : (
+                    <Link to={`/showCurrentEvent/${event._id}`}  >
+                      {event.eventName}
+                    </Link>
+                  )
+                  }
+
                 </td>
                 <td>{formatDate(event.startDate)}</td>
                 <td>{formatDate(event.endDate)}</td>
