@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { backend_url } from "./services";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +15,8 @@ import { sendOtp } from '../API/api';
 function Login({ setIsPartialAuthenticated, setUserEmail, isAdmin, setIsAdmin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleEmailChange = (e) => {
@@ -29,14 +31,18 @@ function Login({ setIsPartialAuthenticated, setUserEmail, isAdmin, setIsAdmin })
     setIsAdmin(e.target.value === "admin");
   };
 
+  useEffect(() => {
+    console.log("Loading->>>>>>>>>>>", loading);
+  },[loading])
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
 
     try {
       // First check if any user already logged in or not
       const token = localStorage.getItem("nss-token");
       console.log("Token: ", token);
-
       if (token !== null) {
         console.log("Not Empty", token, typeof token);
         alert("First Logout current User then try to login");
@@ -60,6 +66,7 @@ function Login({ setIsPartialAuthenticated, setUserEmail, isAdmin, setIsAdmin })
       } else {
         toast.error(data.message);
       }
+      setLoading(false)
     } catch (error) {
       toast.error("Error while logging in...");
       console.error("Error:", error);
@@ -127,7 +134,7 @@ function Login({ setIsPartialAuthenticated, setUserEmail, isAdmin, setIsAdmin })
                 </div>
               </Form.Group>
 
-              <Button variant="primary" type="submit" block>
+              <Button variant="primary" type="submit" disabled={loading} block>
                 Submit
               </Button>
             </Form>
