@@ -1,6 +1,6 @@
 import "./App.css";
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as  Route, Routes, useLocation, Navigate } from 'react-router-dom';
+import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import Login from './Components/Login';
 import Home from './Components/Home';
 import CustomNavbar from './Components/Partial/Navbar';
