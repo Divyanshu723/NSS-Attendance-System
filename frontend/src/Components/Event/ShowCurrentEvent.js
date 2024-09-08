@@ -237,7 +237,7 @@ const ShowEvent = ({ adminId }) => {
       email: entry.email,
       branch: entry.branch,
       year: entry.year,
-      status: entry.events?.includes(event.eventName) ? "Present" : "Absent",
+      status: entry.events?.includes(event._id) ? "Present" : "Absent",
     }));
 
     // Convert modified data to worksheet format
