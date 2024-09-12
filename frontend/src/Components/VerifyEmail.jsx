@@ -85,7 +85,7 @@ const VerifyEmail = ({ userEmail, setIsAuthenticated }) => {
                             <BiArrowBack /> Back To Signup
                         </Button>
                         <Button variant="link" className="text-decoration-none text-blue-100 d-flex align-items-center " style={{ gap: "2px" }} onClick={() => {
-                            sendOtp(userEmail, navigate)
+                            sendOtp(userEmail, navigate, isAdmin)
                         }}>
                             <RxCountdownTimer />
                             Resend it
